@@ -1,0 +1,66 @@
+This is a plugin for Axis2 that uses emi common authentication library 
+for setting up the SSL connections and verifying the server certificate and 
+sending the user credentials.
+
+To use it you'll need to pass the configuration values to the plugin class, either 
+by command line values or in the program through properties and have the jars, 
+canl-1.x.x.jar, canl-java-axis2-0.1.x.jar, commons-io.jar and bcprov-1.46.jar in the 
+classpath.
+
+
+Mandatory attributes:
+- truststore
+directory where all the CA files are in PEM format. Optionally also 
+CRLs and namespaces are there.
+e.g. /etc/grid-security/certificates
+
+either proxy or cert-key-(password) pair
+- proxy
+the file that contains the proxy credentials.
+e.g. /tmp/x509_u500
+
+- cert
+the file that contains the host certificate.
+e.g. /etc/grid-security/tomcat-cert.pem
+
+- key
+the file that contains the host key.
+e.g. /etc/grid-security/tomcat-key.pem
+
+- password
+if the key is protected by password, it has to be given here.
+e.g. changeit
+
+
+Optional attributes:
+- updateinterval
+defines how often the system checks for changes in the trust store.
+By default changes are polled once per hour. The setting is a number
+of milliseconds between the updates.
+
+- crlcheckingmode
+the CRL checking mode. Default is that CRLs are required. If a CA 
+has no valid (not expired, present and valid) CRL, no certificates 
+from that CA are accepted. Other options are "ifvalid" and "ignore".
+"ifvalid" means that a valid CRL is taken into account, but if no 
+valid CRL for a CA is found, all certs from that CA are accepted.
+"ignore" means that the CRLs are ignored and all certificates that
+are validly issued by accepted CA are accepted.
+
+- proxysupport
+whether grid proxy certificates are accepted. By default the proxies
+are accepted. Setting this attribute to "no" disables proxy support
+and all proxies are rejected.
+
+- namespace
+configures the namespace checking. By default the certificates are 
+checked against EU Grid PMA namespace definitions, with fallback to
+Globus signing policy files. If neither are found for a CA, no 
+namespace cheking is done and all certificates from that CA are
+accepted. Other options are "off" and "require". "off" means that
+no namespace checking is done. "require" means that succesful 
+namespace checking against either EU Grid PMA namesapce definition
+or Globus signing policy must be done. If no namespace definition is
+found, no certificates from that CA are accepted.
+
+   

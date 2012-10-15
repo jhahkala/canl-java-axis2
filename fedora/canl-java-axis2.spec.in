@@ -1,0 +1,55 @@
+## Turn off meaningless jar repackaging on SL6
+%define __jar_repack 0
+
+Name: canl-java-axis2
+
+Version: @@VERSION@@
+Release: @@RELEASE@@%{?dist}
+Summary: EMI Common Authentication Library Axis2 plugin
+
+Group: System Environment/Libraries
+License: ASL 2.0
+URL: https://twiki.cern.ch/twiki/bin/view/EMI/CANLTomcatPlugin
+Packager: Joni Hahkala <joni.hahkala@cern.ch>
+
+Source: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch: noarch
+
+BuildRequires: java-devel
+BuildRequires: maven
+
+Requires: java
+Requires: canl-java
+Requires: bcprov
+
+%description 
+Plugin that allows the use of EMI Common Authentication Library in Axis2.
+
+%prep
+%setup -q
+
+%build
+export JAVA_HOME=/usr/lib/jvm/java
+make package
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%dir %{_datadir}/java
+%{_datadir}/java/%{name}.jar
+%{_datadir}/java/%{name}-%{version}.jar
+%doc README.md doc/RELEASE-NOTES doc/COPYRIGHT doc/LICENSE doc/USAGE
+
+
+%changelog
+* Tue Oct 15 2012 Joni Hahkala <joni.hahkala@cern.ch> 0.1.0-1
+- Initial release
+
+
