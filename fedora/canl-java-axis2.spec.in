@@ -9,7 +9,7 @@ Summary: EMI Common Authentication Library Axis2 plugin
 
 Group: System Environment/Libraries
 License: ASL 2.0
-URL: https://twiki.cern.ch/twiki/bin/view/EMI/CANLTomcatPlugin
+URL: https://twiki.cern.ch/twiki/bin/view/EMI/CANLAxis2Plugin
 Packager: Joni Hahkala <joni.hahkala@cern.ch>
 
 Source: %{name}-%{version}.tar.gz

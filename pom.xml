@@ -176,7 +176,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
-				<finalName>canl-java-tomcat</finalName>
+				<finalName>canl-java-axis2</finalName>
 				<plugins>
 					<plugin>
 						<artifactId>maven-compiler-plugin</artifactId>
