@@ -5,12 +5,12 @@ Build-Depends: debhelper (>= 7.0.50~), maven2, default-jdk
 Standards-Version: 3.9.2.0
 Section: java
 Homepage: https://twiki.cern.ch/twiki/bin/view/EMI/CANLAxis2Plugin
-Vcs-Git: https://github.com/jhahkala/canl-java-plugins.git
-Vcs-Browser: https://github.com/jhahkala/canl-java-plugins.git
+Vcs-Git: https://github.com/jhahkala/canl-java-axis2.git
+Vcs-Browser: https://github.com/jhahkala/canl-java-axis2.git
 
 Package: libcanl-java-axis2
 Architecture: all
-Depends: default-jre-headless, lsb-base, libcanl-java, libbcprov, ${java:Depends}, ${misc:Depends}
+Depends: default-jre-headless, lsb-base, libcanl-java, ${java:Depends}, ${misc:Depends}
 Recommends: ${java:Recommends}
 Description: Plugin that allows the use of EMI Common Authentication Library in axis2.
  A plugin for axis2 that allows the use of EMI Common 
