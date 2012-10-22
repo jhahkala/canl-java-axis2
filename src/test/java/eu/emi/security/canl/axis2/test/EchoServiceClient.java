@@ -20,16 +20,18 @@ package eu.emi.security.canl.axis2.test;
 import java.lang.Exception;
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.junit.Test;
 
 import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 
-public class EchoServiceClient {
+public class EchoServiceClient extends TestCase {
     
     
     @Test
-    public void testConnection() throws Exception{
+    public void testConnectionTest() throws Exception{
         Axis2JettyServer.run();
         Properties props = new Properties();
         props.setProperty("truststore", "src/test/certificates");
@@ -48,6 +50,7 @@ public class EchoServiceClient {
             stub.cleanup();
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
 
         props = new Properties();
@@ -65,6 +68,7 @@ public class EchoServiceClient {
             System.out.println("end of output");
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
         System.out.println("end");
         
@@ -72,7 +76,7 @@ public class EchoServiceClient {
 
     public static void main(final String[] args) throws java.lang.Exception {
         EchoServiceClient client = new EchoServiceClient();
-        client.testConnection();
+        client.testConnectionTest();
         System.exit(0);
     }
 }

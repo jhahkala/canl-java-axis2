@@ -53,9 +53,7 @@
  					<generateAllClasses>true</generateAllClasses>
  					<generateServicesXml>true</generateServicesXml> 
  					<syncMode>sync</syncMode>
- 					<skipBuildXML>true</skipBuildXML> 
-<!-- 					<generateTestcase>true</generateTestcase> -->
-<!-- 					<skipWSDL>true</skipWSDL> -->
+ 					<skipBuildXML>true</skipBuildXML>
   					<generateServerSide>true</generateServerSide>
 					<generateServerSideInterface>true</generateServerSideInterface>
 					<packageName>eu.emi.security.canl.axis2.test</packageName>
