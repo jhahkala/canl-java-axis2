@@ -45,6 +45,7 @@
 	</dependencies>
 	<build>
 		<plugins>
+<!-- Run only to regenerate the axis2 code
 			<plugin>
 				<groupId>org.apache.axis2</groupId>
 				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
@@ -68,6 +69,7 @@
 					</execution>
 				</executions>
 			</plugin>
+-->
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
