@@ -45,31 +45,14 @@
 	</dependencies>
 	<build>
 		<plugins>
-<!-- Run only to regenerate the axis2 code
-			<plugin>
-				<groupId>org.apache.axis2</groupId>
-				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-				<version>1.6.2</version>
-				<configuration>
- 					<generateAllClasses>true</generateAllClasses>
- 					<generateServicesXml>true</generateServicesXml> 
- 					<syncMode>sync</syncMode>
- 					<skipBuildXML>true</skipBuildXML>
-  					<generateServerSide>true</generateServerSide>
-					<generateServerSideInterface>true</generateServerSideInterface>
-					<packageName>eu.emi.security.canl.axis2.test</packageName>
-					<wsdlFile>src/interface/EchoService.wsdl</wsdlFile>
-					<databindingName>xmlbeans</databindingName>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>wsdl2code</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
--->
+			<!-- Run only to regenerate the axis2 code <plugin> <groupId>org.apache.axis2</groupId> 
+				<artifactId>axis2-wsdl2code-maven-plugin</artifactId> <version>1.6.2</version> 
+				<configuration> <generateAllClasses>true</generateAllClasses> <generateServicesXml>true</generateServicesXml> 
+				<syncMode>sync</syncMode> <skipBuildXML>true</skipBuildXML> <generateServerSide>true</generateServerSide> 
+				<generateServerSideInterface>true</generateServerSideInterface> <packageName>eu.emi.security.canl.axis2.test</packageName> 
+				<wsdlFile>src/interface/EchoService.wsdl</wsdlFile> <databindingName>xmlbeans</databindingName> 
+				</configuration> <executions> <execution> <goals> <goal>wsdl2code</goal> 
+				</goals> </execution> </executions> </plugin> -->
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
@@ -120,6 +103,18 @@
 				<configuration>
 					<tarLongFileMode>gnu</tarLongFileMode>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
