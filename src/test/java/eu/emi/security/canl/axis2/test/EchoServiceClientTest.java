@@ -27,7 +27,7 @@ import org.junit.Test;
 
 import eu.emi.security.canl.axis2.CANLAXIS2SocketFactory;
 
-public class EchoServiceClient extends TestCase {
+public class EchoServiceClientTest extends TestCase {
     
     
     @Test
@@ -75,7 +75,7 @@ public class EchoServiceClient extends TestCase {
     }
 
     public static void main(final String[] args) throws java.lang.Exception {
-        EchoServiceClient client = new EchoServiceClient();
+        EchoServiceClientTest client = new EchoServiceClientTest();
         client.testConnectionTest();
         System.exit(0);
     }
