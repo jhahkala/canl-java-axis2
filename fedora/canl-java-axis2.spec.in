@@ -48,7 +48,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Nov 02 2012 Joni Hahkala <joni.hahkala@cern.ch> 0.1.1-1
+* Tue Nov 02 2012 Joni Hahkala <joni.hahkala@cern.ch> 0.1.2-1
 - Initial release
 
 
