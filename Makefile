@@ -17,7 +17,7 @@
 
 name=canl-java-axis2
 
-version=0.1.2
+version=0.1.3
 release=1
 
 prefix=/
