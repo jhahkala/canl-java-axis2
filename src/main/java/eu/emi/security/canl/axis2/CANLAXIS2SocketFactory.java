@@ -68,6 +68,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         if (thisProperties == null) {
             thisProperties = System.getProperties();
         }
+        System.out.println("current props: " + thisProperties);
 
         return thisProperties;
     }

@@ -31,7 +31,7 @@ public class EchoServiceClientTest extends TestCase {
     
     
     @Test
-    public void testConnectionTest() throws Exception{
+    public void testEndEntityConnection() throws Exception{
         Axis2JettyServer.run();
         Properties props = new Properties();
         props.setProperty("truststore", "src/test/certificates");
@@ -53,11 +53,20 @@ public class EchoServiceClientTest extends TestCase {
             throw e;
         }
 
+        Axis2JettyServer.stop();
+    }
+    
+    @Test
+    public void testProxyConnection() throws Exception{
+        Axis2JettyServer.run();
+
+        Properties props = new Properties();
         props = new Properties();
         props.setProperty("truststore", "src/test/certificates");
         props.setProperty("proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
         props.setProperty("updateinterval", "0");
         CANLAXIS2SocketFactory.setCurrentProperties(props);
+        CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
         try {
             Protocol.registerProtocol( "https", new Protocol("https", factory, 8443));
             EchoServiceStub stub = new EchoServiceStub("https://localhost:8888/services/EchoService");
@@ -71,12 +80,42 @@ public class EchoServiceClientTest extends TestCase {
             throw e;
         }
         System.out.println("end");
+        Axis2JettyServer.stop();
         
     }
 
+    @Test
+    public void testSystemProps() throws Exception{
+        Axis2JettyServer.run();
+        CANLAXIS2SocketFactory.clearCurrentProperties();
+
+        Properties props = new Properties();
+        props = new Properties();
+        props.setProperty("truststore", "src/test/certificates");
+        props.setProperty("proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
+        props.setProperty("updateinterval", "0");
+        System.setProperties(props);
+        System.out.println(System.getProperties());
+        CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
+        try {
+            Protocol.registerProtocol( "https", new Protocol("https", factory, 8443));
+            EchoServiceStub stub = new EchoServiceStub("https://localhost:8888/services/EchoService");
+            GetAttributesResponseDocument doc = stub.getAttributes();
+
+            System.out.println(doc.getGetAttributesResponse().getReturn());
+            stub.cleanup();
+            System.out.println("end of output");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        System.out.println("end");
+        Axis2JettyServer.stop();
+        
+    }
     public static void main(final String[] args) throws java.lang.Exception {
         EchoServiceClientTest client = new EchoServiceClientTest();
-        client.testConnectionTest();
+        client.testEndEntityConnection();
         System.exit(0);
     }
 }

@@ -31,6 +31,8 @@ import eu.emi.security.authn.x509.impl.SocketFactoryCreator;
 import eu.emi.security.authn.x509.impl.ValidatorParams;
 
 public class Axis2JettyServer {
+	
+	private static Server _server = null;
 
     /**
      * @param args
@@ -40,7 +42,7 @@ public class Axis2JettyServer {
         run();
     }
     
-    static void run() throws Exception{
+    public static void run() throws Exception{
         StoreUpdateListener listener = new StoreUpdateListener() {
             public void loadingNotification(String location, String type, Severity level, Exception cause) {
                 if (level != Severity.NOTIFICATION) {
@@ -100,7 +102,12 @@ public class Axis2JettyServer {
         holder.setInitParameter("axis2.repository.path", "src/test/webapps");   
         holder.setInitParameter("axis2.xml.path", "src/test/conf/axis2.xml");
         server.start();
+        _server = server;
         
+    }
+    
+    public static void stop() throws java.lang.Exception{
+    	_server.stop();
     }
 
 }
