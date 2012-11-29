@@ -34,11 +34,11 @@ public class EchoServiceClientTest extends TestCase {
     public void testEndEntityConnection() throws Exception{
         Axis2JettyServer.run();
         Properties props = new Properties();
-        props.setProperty("truststore", "src/test/certificates");
-        props.setProperty("cert", "src/test/cert/trusted_client.cert");
-        props.setProperty("key", "src/test/cert/trusted_client.priv");
-        props.setProperty("password", "changeit");
-        props.setProperty("updateinterval", "0");
+        props.setProperty("canl.truststore", "src/test/certificates");
+        props.setProperty("canl.cert", "src/test/cert/trusted_client.cert");
+        props.setProperty("canl.key", "src/test/cert/trusted_client.priv");
+        props.setProperty("canl.password", "changeit");
+        props.setProperty("canl.updateinterval", "0");
         CANLAXIS2SocketFactory.setCurrentProperties(props);
         CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
         try {
@@ -49,6 +49,7 @@ public class EchoServiceClientTest extends TestCase {
             System.out.println(doc.getGetAttributesResponse().getReturn());
             stub.cleanup();
         } catch (Exception e) {
+            Axis2JettyServer.stop();
             e.printStackTrace();
             throw e;
         }
@@ -62,9 +63,9 @@ public class EchoServiceClientTest extends TestCase {
 
         Properties props = new Properties();
         props = new Properties();
-        props.setProperty("truststore", "src/test/certificates");
-        props.setProperty("proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
-        props.setProperty("updateinterval", "0");
+        props.setProperty("canl.truststore", "src/test/certificates");
+        props.setProperty("canl.proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
+        props.setProperty("canl.updateinterval", "0");
         CANLAXIS2SocketFactory.setCurrentProperties(props);
         CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
         try {
@@ -76,6 +77,7 @@ public class EchoServiceClientTest extends TestCase {
             stub.cleanup();
             System.out.println("end of output");
         } catch (Exception e) {
+            Axis2JettyServer.stop();
             e.printStackTrace();
             throw e;
         }
@@ -91,10 +93,9 @@ public class EchoServiceClientTest extends TestCase {
 
         Properties props = new Properties();
         props = new Properties();
-        props.setProperty("truststore", "src/test/certificates");
-        props.setProperty("proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
-        props.setProperty("updateinterval", "0");
-        System.setProperties(props);
+        System.setProperty("canl.truststore", "src/test/certificates");
+        System.setProperty("canl.proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
+        System.setProperty("canl.updateinterval", "0");
         System.out.println(System.getProperties());
         CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
         try {
@@ -106,7 +107,8 @@ public class EchoServiceClientTest extends TestCase {
             stub.cleanup();
             System.out.println("end of output");
         } catch (Exception e) {
-            e.printStackTrace();
+            Axis2JettyServer.stop();
+           e.printStackTrace();
             throw e;
         }
         System.out.println("end");

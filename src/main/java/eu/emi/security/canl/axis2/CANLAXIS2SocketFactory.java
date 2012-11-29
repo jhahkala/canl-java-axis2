@@ -27,8 +27,10 @@ import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 
 import eu.emi.security.authn.x509.CrlCheckingMode;
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.OCSPParametes;
 import eu.emi.security.authn.x509.ProxySupport;
 import eu.emi.security.authn.x509.RevocationParameters;
+import eu.emi.security.authn.x509.RevocationParameters.RevocationCheckingOrder;
 import eu.emi.security.authn.x509.StoreUpdateListener;
 import eu.emi.security.authn.x509.X509Credential;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
@@ -49,8 +51,17 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
     // private static final Logger LOGGER =
     // Logger.getLogger("org.glite.security.trustmanager.axis2.AXIS2SocketFactory");
 
-    private static final String SSL_TIMEOUT_SETTING = null;
-    private static final String TIMEOUT_DEFAULT = null;
+    private static final String KEY_STRING = "canl.key";
+    private static final String PASSWORD_STRING = "canl.password";
+    private static final String CERT_STRING = "canl.cert";
+    private static final String PROXY_STRING = "canl.proxy";
+    private static final String UPDATEINTERVAL_STRING = "canl.updateinterval";
+    private static final String NAMESPACE_STRING = "canl.namespace";
+    private static final String TRUSTSTORE_STRING = "canl.truststore";
+    private static final String PROXY_SUPPORT_STRING = "canl.proxysupport";
+    private static final String CRL_CHEKING_MODE_STRING = "canl.crlcheckingmode";
+    private static final String SSL_TIMEOUT_SETTING = null;//"canl.timeout";
+    private static final String TIMEOUT_DEFAULT = null; //"30000";
 
     /** Thread local storage for the thread specific client properties. */
     private static ThreadLocal theAXIS2SocketFactoryProperties = new ThreadLocal();
@@ -107,19 +118,21 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         ArrayList<StoreUpdateListener> listenerList = new ArrayList<StoreUpdateListener>();
         listenerList.add(listener);
 
-        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE);
-        String crlCheckingMode = (String) attributes.get("crlcheckingmode");
+        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+
+        String crlCheckingMode = (String) attributes.get(CRL_CHEKING_MODE_STRING);
         if (crlCheckingMode != null) {
             if (crlCheckingMode.equalsIgnoreCase("ifvalid")) {
-                revParam = new RevocationParameters(CrlCheckingMode.IF_VALID);
-            }
-            if (crlCheckingMode.equalsIgnoreCase("ignore")) {
-                revParam = new RevocationParameters(CrlCheckingMode.IGNORE);
+                revParam = new RevocationParameters(CrlCheckingMode.IF_VALID);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+            } else {
+                if (crlCheckingMode.equalsIgnoreCase("ignore")) {
+                    revParam = new RevocationParameters(CrlCheckingMode.IGNORE);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+                } 
             }
         }
 
         ProxySupport proxySupport = ProxySupport.ALLOW;
-        String proxySupportString = (String) attributes.get("proxysupport");
+        String proxySupportString = (String) attributes.get(PROXY_SUPPORT_STRING);
         if (proxySupportString != null) {
             if (proxySupportString.equalsIgnoreCase("no") || proxySupportString.equalsIgnoreCase("false")) {
                 proxySupport = ProxySupport.DENY;
@@ -128,12 +141,12 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
 
         ValidatorParams validatorParams = new ValidatorParams(revParam, proxySupport, listenerList);
 
-        String trustStoreLocation = (String) attributes.get("truststore");
+        String trustStoreLocation = (String) attributes.get(TRUSTSTORE_STRING);
         if (trustStoreLocation == null) {
             throw new IOException("No truststore defined, unable to load CA certificates and thus create SSL socket.");
         }
 
-        String namespaceModeString = (String) attributes.get("namespace");
+        String namespaceModeString = (String) attributes.get(NAMESPACE_STRING);
         NamespaceCheckingMode namespaceMode = NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS;
         if (namespaceModeString != null) {
             if (namespaceModeString.equalsIgnoreCase("no") || namespaceModeString.equalsIgnoreCase("false")
@@ -147,7 +160,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
 
         }
 
-        String intervalString = (String) attributes.get("updateinterval");
+        String intervalString = (String) attributes.get(UPDATEINTERVAL_STRING);
         long intervalMS = 3600000; // update ever hour
         if (intervalString != null) {
             intervalMS = Long.parseLong(intervalString);
@@ -158,7 +171,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
 
         X509Credential credentials = null;
 
-        String proxyLoc = (String) attributes.get("proxy");
+        String proxyLoc = (String) attributes.get(PROXY_STRING);
         if (proxyLoc != null) {
             try {
                 credentials = new PEMCredential(proxyLoc, null);
@@ -169,7 +182,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
             }
         } else {
 
-            String hostCertLoc = (String) attributes.get("cert");
+            String hostCertLoc = (String) attributes.get(CERT_STRING);
             if (hostCertLoc == null) {
                 throw new IOException(
                         "Variable hostcert undefined, cannot start server with SSL/TLS without host certificate.");
@@ -177,8 +190,8 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
             java.security.cert.X509Certificate[] hostCertChain = CertificateUtils.loadCertificateChain(
                     new FileInputStream(hostCertLoc), Encoding.PEM);
 
-            String password = (String) attributes.get("password");
-            String hostKeyLoc = (String) attributes.get("key");
+            String password = (String) attributes.get(PASSWORD_STRING);
+            String hostKeyLoc = (String) attributes.get(KEY_STRING);
             if (hostKeyLoc == null) {
                 throw new IOException(
                         "Variable hostkey undefined, cannot start server with SSL/TLS without host private key.");
@@ -225,6 +238,8 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         if (localaddr != null) {
             socket.bind(localaddr);
         }
+        
+        System.out.println("in timeout socket connect.....");
 
         // if no timeout is given, see if the property is set and use that
         if (timeout == 0) {
