@@ -96,7 +96,6 @@ public class EchoServiceClientTest extends TestCase {
         System.setProperty("canl.truststore", "src/test/certificates");
         System.setProperty("canl.proxy", "src/test/cert/trusted_client.proxy.grid_proxy");
         System.setProperty("canl.updateinterval", "0");
-        System.out.println(System.getProperties());
         CANLAXIS2SocketFactory factory = new CANLAXIS2SocketFactory();
         try {
             Protocol.registerProtocol( "https", new Protocol("https", factory, 8443));

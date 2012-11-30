@@ -60,8 +60,8 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
     private static final String TRUSTSTORE_STRING = "canl.truststore";
     private static final String PROXY_SUPPORT_STRING = "canl.proxysupport";
     private static final String CRL_CHEKING_MODE_STRING = "canl.crlcheckingmode";
-    private static final String SSL_TIMEOUT_SETTING = null;//"canl.timeout";
-    private static final String TIMEOUT_DEFAULT = null; //"30000";
+    private static final String SSL_TIMEOUT_SETTING = "canl.timeout";
+    private static final String TIMEOUT_DEFAULT = "30000";
 
     /** Thread local storage for the thread specific client properties. */
     private static ThreadLocal theAXIS2SocketFactoryProperties = new ThreadLocal();
@@ -79,7 +79,6 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         if (thisProperties == null) {
             thisProperties = System.getProperties();
         }
-        System.out.println("current props: " + thisProperties);
 
         return thisProperties;
     }
@@ -118,15 +117,15 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         ArrayList<StoreUpdateListener> listenerList = new ArrayList<StoreUpdateListener>();
         listenerList.add(listener);
 
-        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
 
         String crlCheckingMode = (String) attributes.get(CRL_CHEKING_MODE_STRING);
         if (crlCheckingMode != null) {
             if (crlCheckingMode.equalsIgnoreCase("ifvalid")) {
-                revParam = new RevocationParameters(CrlCheckingMode.IF_VALID);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+                revParam = new RevocationParameters(CrlCheckingMode.IF_VALID, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
             } else {
                 if (crlCheckingMode.equalsIgnoreCase("ignore")) {
-                    revParam = new RevocationParameters(CrlCheckingMode.IGNORE);//, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
+                    revParam = new RevocationParameters(CrlCheckingMode.IGNORE, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
                 } 
             }
         }
@@ -219,7 +218,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
     @SuppressWarnings("unused")
     private Socket createSocket(Socket s, boolean autoclose) throws IOException {
         // LOGGER.fatal("createSocket(s, ac): function unimplemented");
-        throw new IOException("createSocket(s, ac) unimplemented");
+        throw new IOException("createSocket(Socket s, boolean autoclose) unimplemented");
     }
 
     /**
@@ -239,8 +238,6 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
             socket.bind(localaddr);
         }
         
-        System.out.println("in timeout socket connect.....");
-
         // if no timeout is given, see if the property is set and use that
         if (timeout == 0) {
             String timeoutString = getCurrentProperties().getProperty(SSL_TIMEOUT_SETTING, TIMEOUT_DEFAULT);
