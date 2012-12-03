@@ -2,9 +2,10 @@ This is a plugin for Axis2 that uses emi common authentication library
 for setting up the SSL connections and verifying the server certificate and 
 sending the user credentials.
 
-To use it you'll need to pass the configuration values to the plugin class, either 
-by command line values or in the program through properties. The variables are 
-scoped by "canl" prefix. You also have to have the jars canl-1.x.x.jar, 
+To use it you'll need to either pass the configuration values to the plugin class, as 
+line values or in the program through properties, or you can generate the 
+SocketFactory yourself and give it as a parameter to the constructor. The variables 
+are scoped by "canl" prefix. You also have to have the jars canl-1.x.x.jar, 
 canl-java-axis2-0.1.x.jar, commons-io.jar and bcprov-1.46.jar in the classpath.
 
 
@@ -62,5 +63,12 @@ no namespace checking is done. "require" means that succesful
 namespace checking against either EU Grid PMA namesapce definition
 or Globus signing policy must be done. If no namespace definition is
 found, no certificates from that CA are accepted.
+
+Command line usage example:
+java -jar test.jar -Dcanl.truststore="/etc/grid-security/certificates" 
+-Dcanl.proxy="/tmp/x509_u500" MyAppClient https://myhost.com:8443/TestApp
+
+For examples for usage directly in code, look at the unit tests 
+for several examples.
 
    

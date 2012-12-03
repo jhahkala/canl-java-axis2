@@ -51,20 +51,26 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
     // private static final Logger LOGGER =
     // Logger.getLogger("org.glite.security.trustmanager.axis2.AXIS2SocketFactory");
 
-    private static final String KEY_STRING = "canl.key";
-    private static final String PASSWORD_STRING = "canl.password";
-    private static final String CERT_STRING = "canl.cert";
-    private static final String PROXY_STRING = "canl.proxy";
-    private static final String UPDATEINTERVAL_STRING = "canl.updateinterval";
-    private static final String NAMESPACE_STRING = "canl.namespace";
-    private static final String TRUSTSTORE_STRING = "canl.truststore";
-    private static final String PROXY_SUPPORT_STRING = "canl.proxysupport";
-    private static final String CRL_CHEKING_MODE_STRING = "canl.crlcheckingmode";
-    private static final String SSL_TIMEOUT_SETTING = "canl.timeout";
-    private static final String TIMEOUT_DEFAULT = "30000";
+    public static final String KEY_STRING = "canl.key";
+    public static final String PASSWORD_STRING = "canl.password";
+    public static final String CERT_STRING = "canl.cert";
+    public static final String PROXY_STRING = "canl.proxy";
+    public static final String UPDATEINTERVAL_STRING = "canl.updateinterval";
+    public static final String NAMESPACE_STRING = "canl.namespace";
+    public static final String TRUSTSTORE_STRING = "canl.truststore";
+    public static final String PROXY_SUPPORT_STRING = "canl.proxysupport";
+    public static final String CRL_CHEKING_MODE_STRING = "canl.crlcheckingmode";
+    public static final String SSL_TIMEOUT_SETTING = "canl.timeout";
+    public static final String TIMEOUT_DEFAULT = "30000";
 
     /** Thread local storage for the thread specific client properties. */
     private static ThreadLocal theAXIS2SocketFactoryProperties = new ThreadLocal();
+
+    /**
+     * Holds the socket factory in case the constructor with already created
+     * socket factory is used.
+     */
+    private SSLSocketFactory _factory = null;
 
     /**
      * Gets the threadlocal properties object if it is set, otherwise returns
@@ -100,115 +106,129 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         // do nothing
     }
 
+    /** Creates a new instance of AXIS2SocketFactory that uses the given SSLSocketFactory */
+    public CANLAXIS2SocketFactory(SSLSocketFactory factory) {
+        _factory = factory;
+    }
+
     /** Creates a new SSLSocket bound to ContextWrapper **/
     private Socket createSocket() throws IOException {
-        Properties attributes = getCurrentProperties();
-        StoreUpdateListener listener = new StoreUpdateListener() {
-            public void loadingNotification(String location, String type, Severity level, Exception cause) {
-                if (level != Severity.NOTIFICATION) {
-                    System.out.println("Error when creating or using SSL socket. Type " + type + " level: " + level
-                            + " cause: " + cause.getClass() + ":" + cause.getMessage());
+
+        if (_factory == null) {
+            Properties attributes = getCurrentProperties();
+            StoreUpdateListener listener = new StoreUpdateListener() {
+                public void loadingNotification(String location, String type, Severity level, Exception cause) {
+                    if (level != Severity.NOTIFICATION) {
+                        System.out.println("Error when creating or using SSL socket. Type " + type + " level: " + level
+                                + " cause: " + cause.getClass() + ":" + cause.getMessage());
+                    } else {
+                        // log successful (re)loading
+                    }
+                }
+            };
+
+            ArrayList<StoreUpdateListener> listenerList = new ArrayList<StoreUpdateListener>();
+            listenerList.add(listener);
+
+            RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE, new OCSPParametes(),
+                    false, RevocationCheckingOrder.CRL_OCSP);
+
+            String crlCheckingMode = (String) attributes.get(CRL_CHEKING_MODE_STRING);
+            if (crlCheckingMode != null) {
+                if (crlCheckingMode.equalsIgnoreCase("ifvalid")) {
+                    revParam = new RevocationParameters(CrlCheckingMode.IF_VALID, new OCSPParametes(), false,
+                            RevocationCheckingOrder.CRL_OCSP);
                 } else {
-                    // log successful (re)loading
-                }
-            }
-        };
-
-        ArrayList<StoreUpdateListener> listenerList = new ArrayList<StoreUpdateListener>();
-        listenerList.add(listener);
-
-        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
-
-        String crlCheckingMode = (String) attributes.get(CRL_CHEKING_MODE_STRING);
-        if (crlCheckingMode != null) {
-            if (crlCheckingMode.equalsIgnoreCase("ifvalid")) {
-                revParam = new RevocationParameters(CrlCheckingMode.IF_VALID, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
-            } else {
-                if (crlCheckingMode.equalsIgnoreCase("ignore")) {
-                    revParam = new RevocationParameters(CrlCheckingMode.IGNORE, new OCSPParametes(), false, RevocationCheckingOrder.CRL_OCSP);
-                } 
-            }
-        }
-
-        ProxySupport proxySupport = ProxySupport.ALLOW;
-        String proxySupportString = (String) attributes.get(PROXY_SUPPORT_STRING);
-        if (proxySupportString != null) {
-            if (proxySupportString.equalsIgnoreCase("no") || proxySupportString.equalsIgnoreCase("false")) {
-                proxySupport = ProxySupport.DENY;
-            }
-        }
-
-        ValidatorParams validatorParams = new ValidatorParams(revParam, proxySupport, listenerList);
-
-        String trustStoreLocation = (String) attributes.get(TRUSTSTORE_STRING);
-        if (trustStoreLocation == null) {
-            throw new IOException("No truststore defined, unable to load CA certificates and thus create SSL socket.");
-        }
-
-        String namespaceModeString = (String) attributes.get(NAMESPACE_STRING);
-        NamespaceCheckingMode namespaceMode = NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS;
-        if (namespaceModeString != null) {
-            if (namespaceModeString.equalsIgnoreCase("no") || namespaceModeString.equalsIgnoreCase("false")
-                    || namespaceModeString.equalsIgnoreCase("off")) {
-                namespaceMode = NamespaceCheckingMode.IGNORE;
-            } else {
-                if (namespaceModeString.equalsIgnoreCase("require")) {
-                    namespaceMode = NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS_REQUIRE;
+                    if (crlCheckingMode.equalsIgnoreCase("ignore")) {
+                        revParam = new RevocationParameters(CrlCheckingMode.IGNORE, new OCSPParametes(), false,
+                                RevocationCheckingOrder.CRL_OCSP);
+                    }
                 }
             }
 
-        }
-
-        String intervalString = (String) attributes.get(UPDATEINTERVAL_STRING);
-        long intervalMS = 3600000; // update ever hour
-        if (intervalString != null) {
-            intervalMS = Long.parseLong(intervalString);
-        }
-
-        OpensslCertChainValidator validator = new OpensslCertChainValidator(trustStoreLocation, namespaceMode,
-                intervalMS, validatorParams);
-
-        X509Credential credentials = null;
-
-        String proxyLoc = (String) attributes.get(PROXY_STRING);
-        if (proxyLoc != null) {
-            try {
-                credentials = new PEMCredential(proxyLoc, null);
-            } catch (KeyStoreException e) {
-                throw new IOException("Error opening proxy from " + proxyLoc + ": ", e);
-            } catch (CertificateException e) {
-                throw new IOException("Error reading proxy from " + proxyLoc + ": ", e);
+            ProxySupport proxySupport = ProxySupport.ALLOW;
+            String proxySupportString = (String) attributes.get(PROXY_SUPPORT_STRING);
+            if (proxySupportString != null) {
+                if (proxySupportString.equalsIgnoreCase("no") || proxySupportString.equalsIgnoreCase("false")) {
+                    proxySupport = ProxySupport.DENY;
+                }
             }
+
+            ValidatorParams validatorParams = new ValidatorParams(revParam, proxySupport, listenerList);
+
+            String trustStoreLocation = (String) attributes.get(TRUSTSTORE_STRING);
+            if (trustStoreLocation == null) {
+                throw new IOException(
+                        "No truststore defined, unable to load CA certificates and thus create SSL socket.");
+            }
+
+            String namespaceModeString = (String) attributes.get(NAMESPACE_STRING);
+            NamespaceCheckingMode namespaceMode = NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS;
+            if (namespaceModeString != null) {
+                if (namespaceModeString.equalsIgnoreCase("no") || namespaceModeString.equalsIgnoreCase("false")
+                        || namespaceModeString.equalsIgnoreCase("off")) {
+                    namespaceMode = NamespaceCheckingMode.IGNORE;
+                } else {
+                    if (namespaceModeString.equalsIgnoreCase("require")) {
+                        namespaceMode = NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS_REQUIRE;
+                    }
+                }
+
+            }
+
+            String intervalString = (String) attributes.get(UPDATEINTERVAL_STRING);
+            long intervalMS = 3600000; // update ever hour
+            if (intervalString != null) {
+                intervalMS = Long.parseLong(intervalString);
+            }
+
+            OpensslCertChainValidator validator = new OpensslCertChainValidator(trustStoreLocation, namespaceMode,
+                    intervalMS, validatorParams);
+
+            X509Credential credentials = null;
+
+            String proxyLoc = (String) attributes.get(PROXY_STRING);
+            if (proxyLoc != null) {
+                try {
+                    credentials = new PEMCredential(proxyLoc, null);
+                } catch (KeyStoreException e) {
+                    throw new IOException("Error opening proxy from " + proxyLoc + ": ", e);
+                } catch (CertificateException e) {
+                    throw new IOException("Error reading proxy from " + proxyLoc + ": ", e);
+                }
+            } else {
+
+                String hostCertLoc = (String) attributes.get(CERT_STRING);
+                if (hostCertLoc == null) {
+                    throw new IOException(
+                            "Variable hostcert undefined, cannot start server with SSL/TLS without host certificate.");
+                }
+                java.security.cert.X509Certificate[] hostCertChain = CertificateUtils.loadCertificateChain(
+                        new FileInputStream(hostCertLoc), Encoding.PEM);
+
+                String password = (String) attributes.get(PASSWORD_STRING);
+                String hostKeyLoc = (String) attributes.get(KEY_STRING);
+                if (hostKeyLoc == null) {
+                    throw new IOException(
+                            "Variable hostkey undefined, cannot start server with SSL/TLS without host private key.");
+                }
+                PrivateKey hostKey = CertificateUtils.loadPrivateKey(new FileInputStream(hostKeyLoc), Encoding.PEM,
+                        password == null ? null : password.toCharArray());
+
+                try {
+                    credentials = new KeyAndCertCredential(hostKey, hostCertChain);
+                } catch (KeyStoreException e) {
+                    throw new IOException("Error while creating keystore: " + e + ": " + e.getMessage(), e);
+                }
+
+            }
+
+            SSLSocketFactory newFactory = SocketFactoryCreator.getSocketFactory(credentials, validator);
+            SSLSocket socket = (SSLSocket) newFactory.createSocket();
+            return socket;
         } else {
-
-            String hostCertLoc = (String) attributes.get(CERT_STRING);
-            if (hostCertLoc == null) {
-                throw new IOException(
-                        "Variable hostcert undefined, cannot start server with SSL/TLS without host certificate.");
-            }
-            java.security.cert.X509Certificate[] hostCertChain = CertificateUtils.loadCertificateChain(
-                    new FileInputStream(hostCertLoc), Encoding.PEM);
-
-            String password = (String) attributes.get(PASSWORD_STRING);
-            String hostKeyLoc = (String) attributes.get(KEY_STRING);
-            if (hostKeyLoc == null) {
-                throw new IOException(
-                        "Variable hostkey undefined, cannot start server with SSL/TLS without host private key.");
-            }
-            PrivateKey hostKey = CertificateUtils.loadPrivateKey(new FileInputStream(hostKeyLoc), Encoding.PEM,
-                    password == null ? null : password.toCharArray());
-
-            try {
-                credentials = new KeyAndCertCredential(hostKey, hostCertChain);
-            } catch (KeyStoreException e) {
-                throw new IOException("Error while creating keystore: " + e + ": " + e.getMessage(), e);
-            }
-
+            return _factory.createSocket();
         }
-
-        SSLSocketFactory factory = SocketFactoryCreator.getSocketFactory(credentials, validator);
-        SSLSocket socket = (SSLSocket) factory.createSocket();
-        return socket;
     }
 
     /**
@@ -237,7 +257,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         if (localaddr != null) {
             socket.bind(localaddr);
         }
-        
+
         // if no timeout is given, see if the property is set and use that
         if (timeout == 0) {
             String timeoutString = getCurrentProperties().getProperty(SSL_TIMEOUT_SETTING, TIMEOUT_DEFAULT);
