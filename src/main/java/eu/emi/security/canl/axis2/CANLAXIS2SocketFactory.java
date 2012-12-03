@@ -101,12 +101,19 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
         theAXIS2SocketFactoryProperties.set(cp);
     }
 
-    /** Creates a new instance of AXIS2SocketFactory */
+    /**
+     * Creates a new instance of AXIS2SocketFactory that will be configured
+     * either by setting current properties or if not set, it tries to read
+     * properties from system properties.
+     */
     public CANLAXIS2SocketFactory() {
         // do nothing
     }
 
-    /** Creates a new instance of AXIS2SocketFactory that uses the given SSLSocketFactory */
+    /**
+     * Creates a new instance of AXIS2SocketFactory that uses the given
+     * SSLSocketFactory
+     */
     public CANLAXIS2SocketFactory(SSLSocketFactory factory) {
         _factory = factory;
     }
@@ -222,7 +229,6 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
                 }
 
             }
-
             SSLSocketFactory newFactory = SocketFactoryCreator.getSocketFactory(credentials, validator);
             SSLSocket socket = (SSLSocket) newFactory.createSocket();
             return socket;
