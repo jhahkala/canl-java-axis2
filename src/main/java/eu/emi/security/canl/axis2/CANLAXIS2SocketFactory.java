@@ -64,7 +64,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
     public static final String TIMEOUT_DEFAULT = "30000";
 
     /** Thread local storage for the thread specific client properties. */
-    private static ThreadLocal theAXIS2SocketFactoryProperties = new ThreadLocal();
+    private static ThreadLocal<Properties> theAXIS2SocketFactoryProperties = new ThreadLocal<Properties>();
 
     /**
      * Holds the socket factory in case the constructor with already created
@@ -241,7 +241,6 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
      * Creates a new SSLSocket bound to ContextWrapper and layered over an
      * existing socket. UNIMPLEMENTED
      **/
-    @SuppressWarnings("unused")
     private Socket createSocket(Socket s, boolean autoclose) throws IOException {
         // LOGGER.fatal("createSocket(s, ac): function unimplemented");
         throw new IOException("createSocket(Socket s, boolean autoclose) unimplemented");
