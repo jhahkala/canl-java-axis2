@@ -48,11 +48,6 @@ valid CRL for a CA is found, all certs from that CA are accepted.
 "ignore" means that the CRLs are ignored and all certificates that
 are validly issued by accepted CA are accepted.
 
-- canl.proxysupport
-whether grid proxy certificates are accepted. By default the proxies
-are accepted. Setting this attribute to "no" disables proxy support
-and all proxies are rejected.
-
 - canl.namespace
 configures the namespace checking. By default the certificates are 
 checked against EU Grid PMA namespace definitions, with fallback to
