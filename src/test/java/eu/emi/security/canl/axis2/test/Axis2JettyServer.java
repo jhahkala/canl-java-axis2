@@ -20,9 +20,11 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import eu.emi.security.authn.x509.CrlCheckingMode;
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
+import eu.emi.security.authn.x509.OCSPParametes;
 import eu.emi.security.authn.x509.ProxySupport;
 import eu.emi.security.authn.x509.RevocationParameters;
 import eu.emi.security.authn.x509.StoreUpdateListener;
+import eu.emi.security.authn.x509.RevocationParameters.RevocationCheckingOrder;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.CertificateUtils.Encoding;
 import eu.emi.security.authn.x509.impl.KeyAndCertCredential;
@@ -57,7 +59,8 @@ public class Axis2JettyServer {
         ArrayList<StoreUpdateListener> listenerList = new ArrayList<StoreUpdateListener>();
         listenerList.add(listener);
 
-        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE);
+        RevocationParameters revParam = new RevocationParameters(CrlCheckingMode.REQUIRE, new OCSPParametes(),
+                false, RevocationCheckingOrder.CRL_OCSP);
 
         ProxySupport proxySupport = ProxySupport.ALLOW;
 
