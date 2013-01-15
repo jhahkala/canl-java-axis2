@@ -197,7 +197,7 @@ public class CANLAXIS2SocketFactory implements ProtocolSocketFactory {
             String proxyLoc = (String) attributes.get(PROXY_STRING);
             if (proxyLoc != null) {
                 try {
-                    credentials = new PEMCredential(proxyLoc, null);
+                    credentials = new PEMCredential(proxyLoc, (char[])null);
                 } catch (KeyStoreException e) {
                     throw new IOException("Error opening proxy from " + proxyLoc + ": ", e);
                 } catch (CertificateException e) {

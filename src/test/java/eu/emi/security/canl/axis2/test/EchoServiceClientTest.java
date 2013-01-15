@@ -142,7 +142,7 @@ public class EchoServiceClientTest extends TestCase {
 				"src/test/certificates", namespaceMode, intervalMS,
 				validatorParams);
 		X509Credential credentials = new PEMCredential(
-				"src/test/cert/trusted_client.proxy.grid_proxy", null);
+				"src/test/cert/trusted_client.proxy.grid_proxy", (char[])null);
 		SSLSocketFactory newFactory = SocketFactoryCreator.getSocketFactory(
 				credentials, validator);
 
